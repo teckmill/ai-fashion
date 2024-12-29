@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['username'] = $username;
                 
                 // Redirect to profile completion
-                header("Location: ../views/profile.php");
+                header("Location: " . SITE_URL . "/views/profile.php");
                 exit;
             }
         } catch (PDOException $e) {
@@ -76,9 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-
-// Get the relative path to root
-$root_path = '../';
 ?>
 
 <!DOCTYPE html>
@@ -91,20 +88,23 @@ $root_path = '../';
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>/css/style.css">
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>/css/auth.css">
 </head>
 <body>
     <?php include '../includes/header.php'; ?>
 
     <div class="auth-container">
         <div class="auth-box">
-            <h1>Create Account</h1>
+            <div class="auth-header">
+                <h1>Create Account</h1>
+                <p>Join AI Fashion and discover your perfect style</p>
+            </div>
             
             <?php if (!empty($errors)): ?>
                 <div class="error-messages">
                     <?php foreach ($errors as $error): ?>
-                        <p class="error-message"><?php echo htmlspecialchars($error); ?></p>
+                        <p class="error-message"><i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($error); ?></p>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
@@ -112,29 +112,64 @@ $root_path = '../';
             <form method="POST" class="auth-form">
                 <div class="form-group">
                     <label for="username">Username</label>
-                    <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($username ?? ''); ?>" required>
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="username" name="username" placeholder="Choose a username" 
+                               value="<?php echo htmlspecialchars($username ?? ''); ?>" required>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email ?? ''); ?>" required>
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" name="email" placeholder="Enter your email"
+                               value="<?php echo htmlspecialchars($email ?? ''); ?>" required>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" 
+                               placeholder="At least 8 characters" required>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="confirm_password">Confirm Password</label>
-                    <input type="password" id="confirm_password" name="confirm_password" required>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="confirm_password" name="confirm_password" 
+                               placeholder="Confirm your password" required>
+                    </div>
                 </div>
 
-                <button type="submit" class="btn-primary">Create Account</button>
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
             </form>
 
+            <div class="social-login">
+                <div class="social-login-divider">
+                    <span>Or sign up with</span>
+                </div>
+                <div class="social-buttons">
+                    <a href="#" class="social-button">
+                        <i class="fab fa-google"></i>
+                    </a>
+                    <a href="#" class="social-button">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="social-button">
+                        <i class="fab fa-apple"></i>
+                    </a>
+                </div>
+            </div>
+
             <div class="auth-links">
-                <p>Already have an account? <a href="login.php">Log In</a></p>
+                <p>Already have an account? <a href="<?php echo SITE_URL; ?>/auth/login.php">Log In</a></p>
             </div>
         </div>
     </div>

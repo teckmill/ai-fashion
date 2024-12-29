@@ -1,7 +1,8 @@
 <?php
 require_once '../includes/config.php';
-require_once '../includes/functions.php';
+require_once '../includes/auth.php';
 
+$auth = new Auth($pdo);
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -14,34 +15,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = "Please enter both email and password";
     } else {
         try {
-            $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-            $stmt->execute([$email]);
-            $user = $stmt->fetch();
-
-            if ($user && password_verify($password, $user['password'])) {
-                // Start session
-                session_start();
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'];
-
-                // Set remember me cookie if requested
-                if ($remember) {
-                    $token = bin2hex(random_bytes(32));
-                    $expires = time() + (86400 * 30); // 30 days
-
-                    // Store token in database
-                    $stmt = $pdo->prepare("
-                        INSERT INTO auth_tokens (user_id, token, expires_at)
-                        VALUES (?, ?, FROM_UNIXTIME(?))
-                    ");
-                    $stmt->execute([$user['id'], $token, $expires]);
-
-                    // Set cookie
-                    setcookie('remember_token', $token, $expires, '/', '', true, true);
-                }
-
+            if ($auth->login($email, $password, $remember)) {
                 // Redirect to home page
-                header("Location: /");
+                header("Location: " . SITE_URL);
                 exit;
             } else {
                 $errors[] = "Invalid email or password";
@@ -60,18 +36,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - AI Fashion</title>
-    <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/auth.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>/css/style.css">
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>/css/auth.css">
 </head>
 <body>
+    <?php include '../includes/header.php'; ?>
+
     <div class="auth-container">
         <div class="auth-box">
-            <h1>Welcome Back</h1>
+            <div class="auth-header">
+                <h1>Welcome Back</h1>
+                <p>Enter your credentials to access your account</p>
+            </div>
             
             <?php if (!empty($errors)): ?>
                 <div class="error-messages">
                     <?php foreach ($errors as $error): ?>
-                        <p class="error"><?php echo htmlspecialchars($error); ?></p>
+                        <p class="error-message"><i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($error); ?></p>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
@@ -79,28 +64,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <form method="POST" class="auth-form">
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required
-                           value="<?php echo htmlspecialchars($email ?? ''); ?>">
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" name="email" placeholder="Enter your email" required
+                               value="<?php echo htmlspecialchars($email ?? ''); ?>">
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                    </div>
                 </div>
 
-                <div class="form-group checkbox">
-                    <input type="checkbox" id="remember" name="remember">
-                    <label for="remember">Remember me</label>
+                <div class="form-group-inline">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="remember" name="remember">
+                        <label for="remember">Remember me</label>
+                    </div>
+                    <a href="<?php echo SITE_URL; ?>/auth/forgot-password.php" class="forgot-password">Forgot Password?</a>
                 </div>
 
-                <button type="submit" class="btn-primary">Log In</button>
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> Log In
+                </button>
             </form>
 
+            <div class="social-login">
+                <div class="social-login-divider">
+                    <span>Or continue with</span>
+                </div>
+                <div class="social-buttons">
+                    <a href="#" class="social-button">
+                        <i class="fab fa-google"></i>
+                    </a>
+                    <a href="#" class="social-button">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="social-button">
+                        <i class="fab fa-apple"></i>
+                    </a>
+                </div>
+            </div>
+
             <div class="auth-links">
-                <p><a href="/auth/forgot-password.php">Forgot Password?</a></p>
-                <p>Don't have an account? <a href="/auth/signup.php">Sign Up</a></p>
+                <p>Don't have an account? <a href="<?php echo SITE_URL; ?>/auth/signup.php">Sign Up</a></p>
             </div>
         </div>
     </div>
+
+    <?php include '../includes/footer.php'; ?>
 </body>
 </html>
