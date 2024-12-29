@@ -119,6 +119,58 @@ CREATE TABLE IF NOT EXISTS products (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Localization table
+CREATE TABLE IF NOT EXISTS localization (
+    user_id INT NOT NULL,
+    locale VARCHAR(5) DEFAULT 'en',
+    currency VARCHAR(3) DEFAULT 'USD',
+    measurement_system ENUM('metric', 'imperial') DEFAULT 'imperial',
+    PRIMARY KEY (user_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Wardrobe items table
+CREATE TABLE IF NOT EXISTS wardrobe_items (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    item_name VARCHAR(255) NOT NULL,
+    item_type VARCHAR(50) NOT NULL,
+    item_data JSON,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Wardrobe usage table
+CREATE TABLE IF NOT EXISTS wardrobe_usage (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    item_id INT NOT NULL,
+    usage_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    context VARCHAR(50),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id) REFERENCES wardrobe_items(id) ON DELETE CASCADE
+);
+
+-- Style evolution table
+CREATE TABLE IF NOT EXISTS style_evolution (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    date DATE NOT NULL,
+    style_category VARCHAR(50) NOT NULL,
+    confidence_score DECIMAL(3,2),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Wardrobe analytics table
+CREATE TABLE IF NOT EXISTS wardrobe_analytics (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    analysis_date DATE NOT NULL,
+    analysis_type VARCHAR(50) NOT NULL,
+    analysis_data JSON,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 -- Insert sample products
 INSERT INTO products (name, description, price, category, image_url, brand) VALUES
 ('Classic White T-Shirt', 'Essential cotton crew neck t-shirt', 19.99, 'tops', 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab', 'Basic Essentials'),

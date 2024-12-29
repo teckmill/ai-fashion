@@ -1,0 +1,51 @@
+{
+    "common": {
+        "welcome": "Bienvenido a AI Fashion Assistant",
+        "login": "Iniciar sesión",
+        "register": "Registrarse",
+        "logout": "Cerrar sesión",
+        "profile": "Perfil",
+        "settings": "Configuración",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "delete": "Eliminar",
+        "edit": "Editar"
+    },
+    "wardrobe": {
+        "title": "Mi Guardarropa",
+        "add_item": "Agregar Prenda",
+        "edit_item": "Editar Prenda",
+        "delete_item": "Eliminar Prenda",
+        "categories": {
+            "tops": "Camisetas",
+            "bottoms": "Pantalones",
+            "dresses": "Vestidos",
+            "outerwear": "Abrigos",
+            "shoes": "Zapatos",
+            "accessories": "Accesorios"
+        }
+    },
+    "analytics": {
+        "title": "Análisis de Estilo",
+        "most_worn": "Prendas Más Usadas",
+        "least_worn": "Prendas Menos Usadas",
+        "style_distribution": "Distribución de Estilos",
+        "seasonal_analysis": "Análisis Estacional",
+        "color_analysis": "Análisis de Color",
+        "style_evolution": "Evolución del Estilo"
+    },
+    "measurements": {
+        "height": "Altura",
+        "weight": "Peso",
+        "chest": "Pecho",
+        "waist": "Cintura",
+        "hips": "Cadera",
+        "inseam": "Entrepierna"
+    },
+    "errors": {
+        "general": "Ocurrió un error",
+        "not_found": "Artículo no encontrado",
+        "invalid_input": "Entrada inválida",
+        "unauthorized": "Acceso no autorizado"
+    }
+}

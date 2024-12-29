@@ -1,0 +1,51 @@
+{
+    "common": {
+        "welcome": "Bienvenue sur AI Fashion Assistant",
+        "login": "Connexion",
+        "register": "S'inscrire",
+        "logout": "Déconnexion",
+        "profile": "Profil",
+        "settings": "Paramètres",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "delete": "Supprimer",
+        "edit": "Modifier"
+    },
+    "wardrobe": {
+        "title": "Ma Garde-robe",
+        "add_item": "Ajouter un Article",
+        "edit_item": "Modifier l'Article",
+        "delete_item": "Supprimer l'Article",
+        "categories": {
+            "tops": "Hauts",
+            "bottoms": "Bas",
+            "dresses": "Robes",
+            "outerwear": "Vêtements d'Extérieur",
+            "shoes": "Chaussures",
+            "accessories": "Accessoires"
+        }
+    },
+    "analytics": {
+        "title": "Analyse de Style",
+        "most_worn": "Articles les Plus Portés",
+        "least_worn": "Articles les Moins Portés",
+        "style_distribution": "Distribution des Styles",
+        "seasonal_analysis": "Analyse Saisonnière",
+        "color_analysis": "Analyse des Couleurs",
+        "style_evolution": "Évolution du Style"
+    },
+    "measurements": {
+        "height": "Taille",
+        "weight": "Poids",
+        "chest": "Poitrine",
+        "waist": "Tour de Taille",
+        "hips": "Hanches",
+        "inseam": "Entrejambe"
+    },
+    "errors": {
+        "general": "Une erreur s'est produite",
+        "not_found": "Article non trouvé",
+        "invalid_input": "Entrée invalide",
+        "unauthorized": "Accès non autorisé"
+    }
+}

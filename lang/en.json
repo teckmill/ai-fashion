@@ -1,0 +1,51 @@
+{
+    "common": {
+        "welcome": "Welcome to AI Fashion Assistant",
+        "login": "Login",
+        "register": "Register",
+        "logout": "Logout",
+        "profile": "Profile",
+        "settings": "Settings",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit"
+    },
+    "wardrobe": {
+        "title": "My Wardrobe",
+        "add_item": "Add Item",
+        "edit_item": "Edit Item",
+        "delete_item": "Delete Item",
+        "categories": {
+            "tops": "Tops",
+            "bottoms": "Bottoms",
+            "dresses": "Dresses",
+            "outerwear": "Outerwear",
+            "shoes": "Shoes",
+            "accessories": "Accessories"
+        }
+    },
+    "analytics": {
+        "title": "Style Analytics",
+        "most_worn": "Most Worn Items",
+        "least_worn": "Least Worn Items",
+        "style_distribution": "Style Distribution",
+        "seasonal_analysis": "Seasonal Analysis",
+        "color_analysis": "Color Analysis",
+        "style_evolution": "Style Evolution"
+    },
+    "measurements": {
+        "height": "Height",
+        "weight": "Weight",
+        "chest": "Chest",
+        "waist": "Waist",
+        "hips": "Hips",
+        "inseam": "Inseam"
+    },
+    "errors": {
+        "general": "An error occurred",
+        "not_found": "Item not found",
+        "invalid_input": "Invalid input",
+        "unauthorized": "Unauthorized access"
+    }
+}

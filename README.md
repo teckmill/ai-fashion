@@ -1,22 +1,12 @@
 # AI Fashion Assistant 👔👗
 
-A modern, intelligent fashion assistant that helps users create personalized outfits, manage their wardrobe, and develop their personal style. Built with vanilla JavaScript, HTML5, and CSS3, this application provides an intuitive and feature-rich experience for fashion enthusiasts.
+A modern, intelligent fashion assistant that helps users create personalized outfits, manage their wardrobe, and develop their personal style. Built with PHP, MySQL, and modern JavaScript, this application provides a comprehensive fashion experience with real-time product recommendations and style insights.
 
 ![AI Fashion Assistant Demo](demo.gif) *(Add your demo gif here)*
 
 ## ✨ Features
 
 ### 🎯 Core Features
-
-#### AI-Powered Outfit Generator
-- Personalized outfit recommendations based on:
-  - Body measurements and type
-  - Style preferences
-  - Occasion
-  - Season
-  - Color preferences
-- Weather-appropriate suggestions using real-time weather data
-- Detailed styling tips and advice
 
 #### 👕 Virtual Wardrobe
 - Digital inventory of your clothing items
@@ -30,13 +20,11 @@ A modern, intelligent fashion assistant that helps users create personalized out
 - Real-time outfit preview
 - Drag-and-drop interface
 - Save favorite combinations
-- Compatible with virtual wardrobe items
 
 #### 📝 Style Quiz
 - Interactive style personality assessment
 - Progress tracking
 - Detailed style profile generation
-- Personalized recommendations based on quiz results
 - Four distinct style personalities:
   - Trendsetter
   - Classic Minimalist
@@ -48,131 +36,183 @@ A modern, intelligent fashion assistant that helps users create personalized out
 - Monthly calendar view
 - Save and track outfit history
 - Easy navigation between months
-- Visual indicators for planned outfits
 
-### 🌟 Additional Features
+### 🛍️ Smart Shopping Features
 
-- **Weather Integration**: Real-time weather-based recommendations
-- **Social Sharing**: Share outfits on Twitter and Pinterest
-- **Local Storage**: Save your wardrobe and preferences
-- **Responsive Design**: Works on all devices
-- **Modern UI/UX**: Clean and intuitive interface
+#### Automated Product Discovery
+- Real-time product scraping from popular fashion retailers
+- Automatic price tracking
+- Multi-source product aggregation
+- Regular catalog updates
+
+#### Personalized Recommendations
+- AI-powered outfit suggestions
+- Style-based product recommendations
+- Learning algorithm adapts to user preferences
+- Interactive feedback system
+
+#### Smart Price Tracking
+- Monitor product prices across retailers
+- Price history visualization
+- Sale alerts and notifications
+- Best deal recommendations
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Modern web browser (Chrome, Firefox, Safari, Edge)
-- Local web server (e.g., Apache, Nginx) or live server extension
+- PHP 7.4 or higher
+- MySQL 5.7 or higher
+- Apache/Nginx web server
+- Composer (for dependency management)
+- Web browser with JavaScript enabled
 
 ### Installation
 
 1. Clone the repository:
-\`\`\`bash
-git clone https://github.com/teckmill/ai-fashion.git
-\`\`\`
+```bash
+git clone https://github.com/yourusername/ai-fashion-assistant.git
+```
 
 2. Navigate to the project directory:
-\`\`\`bash
-cd ai-fashion
-\`\`\`
+```bash
+cd ai-fashion-assistant
+```
 
-3. If using VS Code with Live Server:
-   - Install Live Server extension
-   - Right-click on index.html
-   - Select "Open with Live Server"
+3. Create the database:
+```sql
+mysql -u root -p < database/schema.sql
+```
 
-4. If using Apache/XAMPP:
-   - Copy the project folder to your htdocs directory
-   - Access via localhost/ai-fashion-assistant
+4. Configure your database connection in `includes/config.php`:
+```php
+define('DB_HOST', 'localhost');
+define('DB_USER', 'your_username');
+define('DB_PASS', 'your_password');
+define('DB_NAME', 'ai_fashion');
+```
 
-### Configuration
-
-1. Weather API Setup (Optional):
-   - Sign up for a free API key at [WeatherAPI.com](https://www.weatherapi.com)
-   - Replace 'YOUR_API_KEY' in fashion-ai.js with your actual API key
+5. Set up the product scraper cron job:
+```bash
+# Add to crontab
+0 0 * * * php /path/to/ai-fashion/cron/update_products.php
+```
 
 ## 💻 Technology Stack
 
-- **Frontend**:
-  - HTML5
-  - CSS3 (with CSS Variables and Flexbox/Grid)
-  - Vanilla JavaScript (ES6+)
-- **APIs**:
-  - Weather API for real-time weather data
-- **Storage**:
-  - LocalStorage for data persistence
-- **Design**:
-  - Custom CSS animations
-  - Responsive design principles
-  - Modern glassmorphism UI
+### Backend
+- PHP 7.4+
+- MySQL Database
+- PDO for database operations
+- Custom web scraping engine
+
+### Frontend
+- HTML5
+- CSS3 (with CSS Variables and Flexbox/Grid)
+- Vanilla JavaScript (ES6+)
+- Custom UI components
+
+### Data Collection
+- Automated web scraping
+- Multi-source product aggregation
+- Price tracking system
+- Image processing
 
 ## 📁 Project Structure
 
-\`\`\`
-ai-fashion-assistant/
+```
+ai-fashion/
+├── api/
+│   ├── auth/
+│   ├── products/
+│   └── recommendations/
 ├── css/
-│   └── style.css
+│   ├── style.css
+│   ├── auth.css
+│   └── recommendations.css
+├── database/
+│   └── schema.sql
+├── includes/
+│   ├── config.php
+│   ├── functions.php
+│   ├── product_service.php
+│   ├── recommendations.php
+│   └── scraper.php
 ├── js/
-│   └── fashion-ai.js
+│   ├── auth.js
+│   ├── fashion-ai.js
+│   └── recommendations.js
+├── cron/
+│   └── update_products.php
 ├── index.html
-└── README.md
-\`\`\`
+├── README.md
+├── LICENSE.md
+└── CONTRIBUTING.md
+```
 
-## 🎯 Usage Examples
+## 🔧 Configuration
 
-### Creating an Outfit
-1. Navigate to "Outfit Generator"
-2. Enter your measurements and preferences
-3. Click "Generate Outfit"
-4. View your personalized recommendations
+### Scraper Settings
+Configure scraper sources in `includes/scraper.php`:
+```php
+private $sources = [
+    'hm' => [
+        'base_url' => 'https://www2.hm.com',
+        'categories' => [...]
+    ],
+    'zara' => [
+        'base_url' => 'https://www.zara.com',
+        'categories' => [...]
+    ]
+];
+```
 
-### Managing Your Wardrobe
-1. Go to "Virtual Wardrobe"
-2. Click "Add Item"
-3. Fill in item details and upload image
-4. Use filters to organize your clothes
-
-### Planning Outfits
-1. Access the "Outfit Calendar"
-2. Click on a date
-3. Select or create an outfit
-4. Save to calendar
+### Recommendation Engine
+Adjust recommendation weights in `includes/recommendations.php`:
+```php
+private function getInteractionTypeWeight($type) {
+    return [
+        'purchase' => 1.0,
+        'save' => 0.8,
+        'like' => 0.6,
+        'view' => 0.3,
+        'dismiss' => -0.5
+    ][$type] ?? 0;
+}
+```
 
 ## 🤝 Contributing
 
-Contributions are welcome! Here's how you can help:
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
+### Development Process
 1. Fork the repository
-2. Create a feature branch (\`git checkout -b feature/AmazingFeature\`)
-3. Commit your changes (\`git commit -m 'Add some AmazingFeature'\`)
-4. Push to the branch (\`git push origin feature/AmazingFeature\`)
-5. Open a Pull Request
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
-
-## 🙏 Acknowledgments
-
-- Weather data provided by [WeatherAPI.com](https://www.weatherapi.com)
-- Icons by [Font Awesome](https://fontawesome.com)
-- Inspiration from various fashion apps and services
+This project is licensed under the MIT License - see [LICENSE.md](LICENSE.md) for details.
 
 ## 🔮 Future Enhancements
 
-- Machine learning for better outfit recommendations
-- Integration with online shopping platforms
-- Community features and social sharing
-- AR try-on capabilities
+- Integration with more fashion retailers
+- Advanced ML-based style matching
+- Social sharing features
+- Community recommendations
 - Seasonal trend updates
 - Style inspiration board
-- Outfit rating system
+- Price alert system
 
 ## 📞 Support
 
 For support, please open an issue in the GitHub repository or contact us at [your-email@example.com].
+
+## 🙏 Acknowledgments
+
+- Product data from various fashion retailers
+- Icons by Font Awesome
+- Community contributors
 
 ## 🌟 Show your support
 
