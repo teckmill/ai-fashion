@@ -1,5 +1,6 @@
 <?php
 require_once 'config.php';
+require_once 'product_service.php';
 
 class RecommendationEngine {
     private $userId;
@@ -31,29 +32,28 @@ class RecommendationEngine {
         }
     }
     
-    public function updateStylePreferences($category, $score) {
-        global $pdo;
-        
+    public function getPersonalizedRecommendations($limit = 10) {
         try {
-            $stmt = $pdo->prepare("
-                INSERT INTO style_preferences (user_id, category, preference_score)
-                VALUES (?, ?, ?)
-                ON DUPLICATE KEY UPDATE 
-                preference_score = (preference_score * 0.7 + VALUES(preference_score) * 0.3)
-            ");
+            // Get user's style preferences
+            $preferences = $this->getUserPreferences();
             
-            return $stmt->execute([$this->userId, $category, $score]);
-        } catch (PDOException $e) {
-            error_log("Error updating style preferences: " . $e->getMessage());
-            return false;
+            // Get user's recent interactions
+            $interactions = $this->getUserInteractions();
+            
+            // Generate recommendations based on preferences and interactions
+            $recommendations = $this->generateRecommendations($preferences, $interactions, $limit);
+            
+            return $recommendations;
+        } catch (Exception $e) {
+            error_log("Error getting recommendations: " . $e->getMessage());
+            return [];
         }
     }
     
-    public function getPersonalizedRecommendations($limit = 10) {
+    private function getUserPreferences() {
         global $pdo;
         
         try {
-            // Get user's style preferences
             $stmt = $pdo->prepare("
                 SELECT category, preference_score 
                 FROM style_preferences 
@@ -61,102 +61,93 @@ class RecommendationEngine {
                 ORDER BY preference_score DESC
             ");
             $stmt->execute([$this->userId]);
-            $preferences = $stmt->fetchAll();
-            
-            // Get recent interactions
-            $stmt = $pdo->prepare("
-                SELECT item_type, item_id, interaction_type, COUNT(*) as interaction_count
-                FROM user_interactions
-                WHERE user_id = ?
-                GROUP BY item_type, item_id, interaction_type
-                ORDER BY interaction_count DESC
-                LIMIT ?
-            ");
-            $stmt->execute([$this->userId, $limit]);
-            $interactions = $stmt->fetchAll();
-            
-            // Combine preferences and interactions to generate recommendations
-            $recommendations = $this->generateRecommendations($preferences, $interactions);
-            
-            return $recommendations;
+            return $stmt->fetchAll();
         } catch (PDOException $e) {
-            error_log("Error getting recommendations: " . $e->getMessage());
+            error_log("Error getting user preferences: " . $e->getMessage());
             return [];
         }
     }
     
-    private function generateRecommendations($preferences, $interactions) {
-        // Initialize recommendation scores
-        $recommendationScores = [];
-        
-        // Weight factors
-        $preferenceWeight = 0.6;
-        $interactionWeight = 0.4;
-        
-        // Process style preferences
-        foreach ($preferences as $pref) {
-            $category = $pref['category'];
-            $score = $pref['preference_score'];
-            
-            if (!isset($recommendationScores[$category])) {
-                $recommendationScores[$category] = 0;
-            }
-            $recommendationScores[$category] += $score * $preferenceWeight;
-        }
-        
-        // Process interactions
-        foreach ($interactions as $interaction) {
-            $type = $interaction['interaction_type'];
-            $itemType = $interaction['item_type'];
-            $count = $interaction['interaction_count'];
-            
-            // Weight different interaction types
-            $typeWeights = [
-                'purchase' => 1.0,
-                'save' => 0.8,
-                'like' => 0.6,
-                'view' => 0.3,
-                'dismiss' => -0.5
-            ];
-            
-            $weight = $typeWeights[$type] ?? 0;
-            $score = $count * $weight * $interactionWeight;
-            
-            if (!isset($recommendationScores[$itemType])) {
-                $recommendationScores[$itemType] = 0;
-            }
-            $recommendationScores[$itemType] += $score;
-        }
-        
-        // Sort recommendations by score
-        arsort($recommendationScores);
-        
-        // Convert scores to recommendations
-        $recommendations = [];
-        foreach ($recommendationScores as $category => $score) {
-            // Get products for this category
-            $products = $this->getProductsByCategory($category);
-            $recommendations = array_merge($recommendations, $products);
-        }
-        
-        return array_slice($recommendations, 0, 10); // Return top 10 recommendations
-    }
-    
-    private function getProductsByCategory($category) {
+    private function getUserInteractions($limit = 20) {
         global $pdo;
         
         try {
             $stmt = $pdo->prepare("
-                SELECT * FROM product_recommendations
-                WHERE category = ? AND user_id = ?
-                ORDER BY created_at DESC
-                LIMIT 5
+                SELECT item_id, item_type, interaction_type, COUNT(*) as count
+                FROM user_interactions
+                WHERE user_id = ?
+                GROUP BY item_id, item_type, interaction_type
+                ORDER BY COUNT(*) DESC
+                LIMIT ?
             ");
-            $stmt->execute([$category, $this->userId]);
+            $stmt->execute([$this->userId, $limit]);
             return $stmt->fetchAll();
         } catch (PDOException $e) {
-            error_log("Error getting products by category: " . $e->getMessage());
+            error_log("Error getting user interactions: " . $e->getMessage());
             return [];
         }
+    }
+    
+    private function generateRecommendations($preferences, $interactions, $limit) {
+        // Calculate category weights based on preferences and interactions
+        $categoryWeights = $this->calculateCategoryWeights($preferences, $interactions);
+        
+        // Get recommended products for each category
+        $recommendations = [];
+        foreach ($categoryWeights as $category => $weight) {
+            $categoryProducts = ProductService::getProducts($category, ceil($limit * $weight));
+            $recommendations = array_merge($recommendations, $categoryProducts);
+        }
+        
+        // Shuffle and limit results
+        shuffle($recommendations);
+        return array_slice($recommendations, 0, $limit);
+    }
+    
+    private function calculateCategoryWeights($preferences, $interactions) {
+        $weights = [
+            'tops' => 0.2,
+            'bottoms' => 0.2,
+            'dresses' => 0.15,
+            'outerwear' => 0.15,
+            'shoes' => 0.15,
+            'accessories' => 0.15
+        ];
+        
+        // Adjust weights based on preferences
+        foreach ($preferences as $pref) {
+            if (isset($weights[$pref['category']])) {
+                $weights[$pref['category']] += $pref['preference_score'] * 0.1;
+            }
+        }
+        
+        // Adjust weights based on interactions
+        foreach ($interactions as $interaction) {
+            if ($interaction['item_type'] === 'product') {
+                $product = ProductService::getProductsByIds([$interaction['item_id']])[0] ?? null;
+                if ($product && isset($weights[$product['category']])) {
+                    $interactionWeight = $this->getInteractionTypeWeight($interaction['interaction_type']);
+                    $weights[$product['category']] += $interactionWeight * 0.05;
+                }
+            }
+        }
+        
+        // Normalize weights
+        $total = array_sum($weights);
+        foreach ($weights as &$weight) {
+            $weight = $weight / $total;
+        }
+        
+        return $weights;
+    }
+    
+    private function getInteractionTypeWeight($type) {
+        return [
+            'purchase' => 1.0,
+            'save' => 0.8,
+            'like' => 0.6,
+            'view' => 0.3,
+            'dismiss' => -0.5
+        ][$type] ?? 0;
     }
 }
