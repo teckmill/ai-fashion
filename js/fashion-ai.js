@@ -202,95 +202,236 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize the form
     showStep(currentStep);
 
-    // Function to generate outfit
-    function generateOutfit() {
-        const resultsSection = document.querySelector('.results');
-        if (!resultsSection) return;
+    // Function to show loading animation
+    function showLoading() {
+        const loadingContainer = document.querySelector('.loading-container');
+        loadingContainer.style.display = 'flex';
+    }
 
-        // Get body type based on height and weight
-        const heightInTotal = (parseInt(formData.heightFeet) * 12) + parseInt(formData.heightInches);
-        const weight = parseInt(formData.weight);
-        const bodyType = determineBodyType(heightInTotal, weight);
+    function hideLoading() {
+        const loadingContainer = document.querySelector('.loading-container');
+        loadingContainer.style.display = 'none';
+    }
 
-        // Get season-appropriate fabrics and layers
-        const fabricSuggestions = getSeasonalFabrics(formData.season);
-        const colorScheme = getColorScheme(formData.colorPreference, formData.season);
+    // Function to save outfit to history
+    function saveOutfit(outfitData) {
+        let outfits = JSON.parse(localStorage.getItem('savedOutfits') || '[]');
+        outfitData.date = new Date().toISOString();
+        outfits.push(outfitData);
+        localStorage.setItem('savedOutfits', JSON.stringify(outfits));
+        updateOutfitHistory();
+    }
+
+    // Function to update outfit history display
+    function updateOutfitHistory() {
+        const historyGrid = document.querySelector('.history-grid');
+        const outfits = JSON.parse(localStorage.getItem('savedOutfits') || '[]');
         
-        // Get specific outfit pieces based on style and occasion
-        const outfitPieces = getOutfitPieces(formData.style, formData.occasion, bodyType, formData.season);
+        historyGrid.innerHTML = outfits.reverse().slice(0, 6).map(outfit => `
+            <div class="history-item" onclick="loadSavedOutfit(${JSON.stringify(outfit).replace(/"/g, '&quot;')})">
+                <div class="history-date">${new Date(outfit.date).toLocaleDateString()}</div>
+                <h3>${outfit.style} for ${outfit.occasion}</h3>
+                <p>Season: ${outfit.season}</p>
+                <p>Color Scheme: ${outfit.colorPreference}</p>
+            </div>
+        `).join('');
+    }
 
-        // Generate styling tips
-        const stylingTips = getStylingTips(bodyType, formData.style, formData.season);
+    // Function to load saved outfit
+    function loadSavedOutfit(outfit) {
+        formData = { ...outfit };
+        generateOutfit();
+    }
 
-        const outfitHtml = `
-            <h2>Your Personalized Outfit Recommendation</h2>
-            <div class="outfit-details">
-                <div class="outfit-summary">
-                    <h3>Your Style Profile</h3>
-                    <ul class="profile-details">
-                        <li><strong>Style Preference:</strong> ${formData.style}</li>
-                        <li><strong>Occasion:</strong> ${formData.occasion}</li>
-                        <li><strong>Body Type:</strong> ${bodyType.name}</li>
-                        <li><strong>Season:</strong> ${formData.season}</li>
-                        <li><strong>Color Palette:</strong> ${formData.colorPreference}</li>
-                    </ul>
-                </div>
+    // Function to get weather data
+    async function getWeatherData() {
+        try {
+            const response = await fetch('https://api.weatherapi.com/v1/current.json?key=YOUR_API_KEY&q=auto:ip');
+            const data = await response.json();
+            return {
+                temp: data.current.temp_c,
+                condition: data.current.condition.text,
+                icon: data.current.condition.icon
+            };
+        } catch (error) {
+            console.error('Error fetching weather:', error);
+            return null;
+        }
+    }
 
-                <div class="outfit-recommendation">
-                    <h3>Recommended Outfit</h3>
-                    <div class="outfit-pieces">
-                        ${outfitPieces.map(piece => `
-                            <div class="outfit-piece">
-                                <i class="${piece.icon}"></i>
-                                <h4>${piece.name}</h4>
-                                <p>${piece.description}</p>
-                                <div class="piece-details">
-                                    <span class="fabric">Fabric: ${piece.fabric}</span>
-                                    <span class="color">Color: ${piece.color}</span>
-                                </div>
-                            </div>
-                        `).join('')}
+    // Function to generate weather-appropriate recommendations
+    function getWeatherBasedRecommendations(weather) {
+        const temp = weather.temp;
+        let recommendations = [];
+
+        if (temp < 10) {
+            recommendations.push(
+                'Layer up with warm, insulating pieces',
+                'Consider a heavy coat or jacket',
+                'Don\'t forget winter accessories like scarves and gloves'
+            );
+        } else if (temp < 20) {
+            recommendations.push(
+                'A light jacket or sweater would be appropriate',
+                'Consider layering for temperature changes',
+                'Light scarves can add both style and warmth'
+            );
+        } else {
+            recommendations.push(
+                'Choose breathable, lightweight fabrics',
+                'Consider UV protection in your outfit choices',
+                'Light colors reflect heat better'
+            );
+        }
+
+        return recommendations;
+    }
+
+    // Enhance generateOutfit function
+    async function generateOutfit() {
+        showLoading();
+
+        // Get weather data
+        const weather = await getWeatherData();
+        
+        // Generate outfit after a slight delay for loading animation
+        setTimeout(async () => {
+            const resultsSection = document.querySelector('.results');
+            if (!resultsSection) {
+                hideLoading();
+                return;
+            }
+
+            // Get all the outfit components as before...
+            const heightInTotal = (parseInt(formData.heightFeet) * 12) + parseInt(formData.heightInches);
+            const weight = parseInt(formData.weight);
+            const bodyType = determineBodyType(heightInTotal, weight);
+            const fabricSuggestions = getSeasonalFabrics(formData.season);
+            const colorScheme = getColorScheme(formData.colorPreference, formData.season);
+            const outfitPieces = getOutfitPieces(formData.style, formData.occasion, bodyType, formData.season);
+            const stylingTips = getStylingTips(bodyType, formData.style, formData.season);
+
+            // Add weather-based recommendations if available
+            let weatherHtml = '';
+            if (weather) {
+                const weatherTips = getWeatherBasedRecommendations(weather);
+                weatherHtml = `
+                    <div class="weather-info">
+                        <div class="weather-icon">
+                            <i class="fas ${weather.temp < 10 ? 'fa-snowflake' : weather.temp > 20 ? 'fa-sun' : 'fa-cloud'}"></i>
+                        </div>
+                        <div class="weather-details">
+                            <div class="weather-temp">${weather.temp}°C</div>
+                            <div class="weather-desc">${weather.condition}</div>
+                        </div>
                     </div>
-                </div>
+                `;
+            }
 
-                <div class="styling-guide">
-                    <div class="color-palette">
-                        <h3>Recommended Color Palette</h3>
-                        <div class="color-chips">
-                            ${colorScheme.map(color => `
-                                <div class="color-chip" style="background-color: ${color.hex}">
-                                    <span>${color.name}</span>
+            // Generate the outfit HTML as before...
+            const outfitHtml = `
+                <h2>Your Personalized Outfit Recommendation</h2>
+                ${weatherHtml}
+                <div class="outfit-details">
+                    <div class="outfit-summary">
+                        <h3>Your Style Profile</h3>
+                        <ul class="profile-details">
+                            <li><strong>Style Preference:</strong> ${formData.style}</li>
+                            <li><strong>Occasion:</strong> ${formData.occasion}</li>
+                            <li><strong>Body Type:</strong> ${bodyType.name}</li>
+                            <li><strong>Season:</strong> ${formData.season}</li>
+                            <li><strong>Color Palette:</strong> ${formData.colorPreference}</li>
+                        </ul>
+                    </div>
+
+                    <div class="outfit-recommendation">
+                        <h3>Recommended Outfit</h3>
+                        <div class="outfit-pieces">
+                            ${outfitPieces.map(piece => `
+                                <div class="outfit-piece">
+                                    <i class="${piece.icon}"></i>
+                                    <h4>${piece.name}</h4>
+                                    <p>${piece.description}</p>
+                                    <div class="piece-details">
+                                        <span class="fabric">Fabric: ${piece.fabric}</span>
+                                        <span class="color">Color: ${piece.color}</span>
+                                    </div>
                                 </div>
                             `).join('')}
                         </div>
                     </div>
 
-                    <div class="fabric-suggestions">
-                        <h3>Recommended Fabrics for ${formData.season}</h3>
-                        <ul>
-                            ${fabricSuggestions.map(fabric => `
-                                <li>
-                                    <strong>${fabric.name}:</strong> ${fabric.description}
-                                </li>
-                            `).join('')}
-                        </ul>
-                    </div>
+                    <div class="styling-guide">
+                        <div class="color-palette">
+                            <h3>Recommended Color Palette</h3>
+                            <div class="color-chips">
+                                ${colorScheme.map(color => `
+                                    <div class="color-chip" style="background-color: ${color.hex}">
+                                        <span>${color.name}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
 
-                    <div class="styling-tips">
-                        <h3>Personalized Styling Tips</h3>
-                        <ul>
-                            ${stylingTips.map(tip => `<li>${tip}</li>`).join('')}
-                        </ul>
+                        <div class="fabric-suggestions">
+                            <h3>Recommended Fabrics for ${formData.season}</h3>
+                            <ul>
+                                ${fabricSuggestions.map(fabric => `
+                                    <li>
+                                        <strong>${fabric.name}:</strong> ${fabric.description}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+
+                        <div class="styling-tips">
+                            <h3>Personalized Styling Tips</h3>
+                            <ul>
+                                ${stylingTips.map(tip => `<li>${tip}</li>`).join('')}
+                            </ul>
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
+                <div class="action-buttons">
+                    <button class="save-outfit" onclick="saveOutfit(${JSON.stringify(formData)})">
+                        <i class="fas fa-save"></i>
+                        Save Outfit
+                    </button>
+                    <div class="share-buttons">
+                        <button class="share-button" onclick="shareOutfit('twitter')">
+                            <i class="fab fa-twitter"></i>
+                            Tweet
+                        </button>
+                        <button class="share-button" onclick="shareOutfit('pinterest')">
+                            <i class="fab fa-pinterest"></i>
+                            Pin
+                        </button>
+                    </div>
+                </div>
+            `;
 
-        resultsSection.innerHTML = outfitHtml;
-        resultsSection.style.display = 'block';
-        
-        // Smooth scroll to results
-        resultsSection.scrollIntoView({ behavior: 'smooth' });
+            resultsSection.innerHTML = outfitHtml;
+            resultsSection.style.display = 'block';
+            hideLoading();
+            
+            // Smooth scroll to results
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }, 1500);
+    }
+
+    // Function to share outfit
+    function shareOutfit(platform) {
+        const outfitDesc = `Check out my ${formData.style} outfit for ${formData.occasion} from AI Fashion Designer!`;
+        const url = window.location.href;
+
+        switch(platform) {
+            case 'twitter':
+                window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(outfitDesc)}&url=${encodeURIComponent(url)}`);
+                break;
+            case 'pinterest':
+                window.open(`https://pinterest.com/pin/create/button/?url=${encodeURIComponent(url)}&description=${encodeURIComponent(outfitDesc)}`);
+                break;
+        }
     }
 
     // Helper function to determine body type
@@ -496,4 +637,7 @@ document.addEventListener('DOMContentLoaded', function() {
             styleTips[style.toLowerCase()] || 'Create a balanced look that reflects your personal style'
         ];
     }
+
+    // Initialize history on load
+    updateOutfitHistory();
 });
