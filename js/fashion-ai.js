@@ -640,4 +640,407 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize history on load
     updateOutfitHistory();
+
+    // Virtual Wardrobe
+    const wardrobe = {
+        items: JSON.parse(localStorage.getItem('wardrobeItems') || '[]'),
+
+        addItem(item) {
+            this.items.push(item);
+            this.saveItems();
+            this.renderItems();
+        },
+
+        removeItem(index) {
+            this.items.splice(index, 1);
+            this.saveItems();
+            this.renderItems();
+        },
+
+        saveItems() {
+            localStorage.setItem('wardrobeItems', JSON.stringify(this.items));
+        },
+
+        filterItems(category = 'all', season = 'all') {
+            return this.items.filter(item => {
+                const categoryMatch = category === 'all' || item.category === category;
+                const seasonMatch = season === 'all' || item.seasons.includes(season);
+                return categoryMatch && seasonMatch;
+            });
+        },
+
+        renderItems() {
+            const grid = document.querySelector('.wardrobe-grid');
+            const category = document.getElementById('categoryFilter').value;
+            const season = document.getElementById('seasonFilter').value;
+            const filteredItems = this.filterItems(category, season);
+
+            grid.innerHTML = filteredItems.map((item, index) => `
+                <div class="wardrobe-item">
+                    ${item.image ? `<img src="${item.image}" alt="${item.name}">` : ''}
+                    <h4>${item.name}</h4>
+                    <p>${item.category}</p>
+                    <div class="item-seasons">
+                        ${item.seasons.map(s => `<span>${s}</span>`).join('')}
+                    </div>
+                    <button onclick="wardrobe.removeItem(${index})">Remove</button>
+                </div>
+            `).join('');
+        }
+    };
+
+    // Mix & Match Feature
+    const mixMatch = {
+        selectedItems: {
+            tops: null,
+            bottoms: null,
+            shoes: null,
+            accessories: null
+        },
+
+        selectItem(type, item) {
+            this.selectedItems[type] = item;
+            this.updatePreview();
+        },
+
+        updatePreview() {
+            const preview = document.querySelector('.preview-container');
+            preview.innerHTML = Object.entries(this.selectedItems)
+                .filter(([_, item]) => item)
+                .map(([type, item]) => `
+                    <div class="selected-item ${type}">
+                        ${item.image ? `<img src="${item.image}" alt="${item.name}">` : ''}
+                        <p>${item.name}</p>
+                    </div>
+                `).join('');
+        }
+    };
+
+    // Style Quiz
+    const styleQuiz = {
+        questions: [
+            {
+                text: "Which colors do you feel most confident wearing?",
+                options: ["Neutrals", "Bold & Bright", "Pastels", "Earth Tones"]
+            },
+            {
+                text: "How would you describe your typical daily style?",
+                options: ["Casual", "Professional", "Trendy", "Classic"]
+            },
+            {
+                text: "What's your preferred fit for clothing?",
+                options: ["Fitted", "Loose & Flowy", "Mix of Both", "Structured"]
+            },
+            {
+                text: "Which decade's fashion inspires you the most?",
+                options: ["90s", "2000s", "2010s", "Timeless"]
+            }
+        ],
+        currentQuestion: 0,
+        answers: [],
+
+        start() {
+            this.currentQuestion = 0;
+            this.answers = [];
+            this.renderQuestion();
+        },
+
+        renderQuestion() {
+            const container = document.querySelector('.quiz-container');
+            const question = this.questions[this.currentQuestion];
+            const progress = ((this.currentQuestion + 1) / this.questions.length) * 100;
+
+            document.querySelector('.progress-bar').style.width = `${progress}%`;
+
+            container.innerHTML = `
+                <h3>${question.text}</h3>
+                <div class="options-grid">
+                    ${question.options.map((option, index) => `
+                        <button onclick="styleQuiz.selectAnswer(${index})" class="quiz-option">
+                            ${option}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+        },
+
+        selectAnswer(index) {
+            this.answers.push(this.questions[this.currentQuestion].options[index]);
+            
+            if (this.currentQuestion < this.questions.length - 1) {
+                this.currentQuestion++;
+                this.renderQuestion();
+            } else {
+                this.showResults();
+            }
+        },
+
+        showResults() {
+            const styleProfile = this.analyzeAnswers();
+            const container = document.querySelector('.quiz-container');
+            
+            container.innerHTML = `
+                <h3>Your Style Profile</h3>
+                <div class="quiz-results">
+                    <p>Based on your answers, your style personality is: <strong>${styleProfile.personality}</strong></p>
+                    <p>${styleProfile.description}</p>
+                    <div class="style-recommendations">
+                        <h4>Recommended Pieces:</h4>
+                        <ul>
+                            ${styleProfile.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        },
+
+        analyzeAnswers() {
+            // Simple analysis based on answers
+            const personalities = {
+                'Trendsetter': {
+                    description: 'You love staying ahead of fashion trends and aren\'t afraid to make bold choices.',
+                    recommendations: [
+                        'Statement pieces in current trends',
+                        'Bold accessories',
+                        'Mix of classic and contemporary items'
+                    ]
+                },
+                'Classic Minimalist': {
+                    description: 'You appreciate timeless pieces and clean, sophisticated looks.',
+                    recommendations: [
+                        'High-quality basics',
+                        'Neutral color palette',
+                        'Structured blazers and tailored pieces'
+                    ]
+                },
+                'Bohemian Spirit': {
+                    description: 'You have a free-spirited approach to fashion with a love for artistic expression.',
+                    recommendations: [
+                        'Flowy dresses and skirts',
+                        'Natural fabrics and textures',
+                        'Layered jewelry and accessories'
+                    ]
+                },
+                'Urban Casual': {
+                    description: 'You value comfort without sacrificing style, perfect for a modern lifestyle.',
+                    recommendations: [
+                        'Premium basics with interesting details',
+                        'Smart casual pieces',
+                        'Versatile layering pieces'
+                    ]
+                }
+            };
+
+            // Determine personality based on answers
+            const personality = this.determinePersonality(this.answers);
+            return {
+                personality,
+                ...personalities[personality]
+            };
+        },
+
+        determinePersonality(answers) {
+            // Simple algorithm to determine style personality
+            const stylePoints = {
+                'Trendsetter': 0,
+                'Classic Minimalist': 0,
+                'Bohemian Spirit': 0,
+                'Urban Casual': 0
+            };
+
+            // Analyze answers and increment points
+            answers.forEach(answer => {
+                if (['Bold & Bright', 'Trendy', 'Fitted', '2010s'].includes(answer)) {
+                    stylePoints['Trendsetter']++;
+                }
+                if (['Neutrals', 'Professional', 'Structured', 'Timeless'].includes(answer)) {
+                    stylePoints['Classic Minimalist']++;
+                }
+                if (['Pastels', 'Loose & Flowy', 'Mix of Both', '2000s'].includes(answer)) {
+                    stylePoints['Bohemian Spirit']++;
+                }
+                if (['Earth Tones', 'Casual', 'Mix of Both', '90s'].includes(answer)) {
+                    stylePoints['Urban Casual']++;
+                }
+            });
+
+            // Return personality with highest points
+            return Object.entries(stylePoints)
+                .reduce((a, b) => a[1] > b[1] ? a : b)[0];
+        }
+    };
+
+    // Outfit Calendar
+    const outfitCalendar = {
+        currentDate: new Date(),
+        selectedDate: null,
+        events: JSON.parse(localStorage.getItem('calendarEvents') || '[]'),
+
+        init() {
+            this.renderCalendar();
+            this.attachEventListeners();
+        },
+
+        renderCalendar() {
+            const grid = document.querySelector('.calendar-grid');
+            const monthYear = document.querySelector('.current-month');
+            const firstDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1);
+            const lastDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0);
+            
+            monthYear.textContent = this.currentDate.toLocaleDateString('default', { 
+                month: 'long', 
+                year: 'numeric' 
+            });
+
+            let days = [];
+            
+            // Add empty cells for days before first of month
+            for (let i = 0; i < firstDay.getDay(); i++) {
+                days.push('<div class="calendar-day empty"></div>');
+            }
+
+            // Add days of month
+            for (let i = 1; i <= lastDay.getDate(); i++) {
+                const date = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), i);
+                const event = this.getEvent(date);
+                const isToday = this.isToday(date);
+                
+                days.push(`
+                    <div class="calendar-day ${event ? 'has-outfit' : ''} ${isToday ? 'today' : ''}"
+                         data-date="${date.toISOString()}">
+                        <div class="day-number">${i}</div>
+                        ${event ? `
+                            <div class="day-outfit">
+                                <small>${event.outfit}</small>
+                            </div>
+                        ` : ''}
+                    </div>
+                `);
+            }
+
+            grid.innerHTML = days.join('');
+        },
+
+        attachEventListeners() {
+            document.querySelector('.prev-month').addEventListener('click', () => {
+                this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+                this.renderCalendar();
+            });
+
+            document.querySelector('.next-month').addEventListener('click', () => {
+                this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+                this.renderCalendar();
+            });
+        },
+
+        getEvent(date) {
+            return this.events.find(event => 
+                new Date(event.date).toDateString() === date.toDateString()
+            );
+        },
+
+        isToday(date) {
+            const today = new Date();
+            return date.toDateString() === today.toDateString();
+        },
+
+        addEvent(date, outfit) {
+            this.events.push({ date: date.toISOString(), outfit });
+            localStorage.setItem('calendarEvents', JSON.stringify(this.events));
+            this.renderCalendar();
+        }
+    };
+
+    // Initialize new features
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initialize wardrobe filters
+        document.getElementById('categoryFilter').addEventListener('change', () => wardrobe.renderItems());
+        document.getElementById('seasonFilter').addEventListener('change', () => wardrobe.renderItems());
+
+        // Initialize outfit calendar
+        outfitCalendar.init();
+
+        // Add navigation menu
+        const navMenu = document.createElement('div');
+        navMenu.className = 'nav-menu';
+        navMenu.innerHTML = `
+            <button class="nav-item active" data-section="main-form">Outfit Generator</button>
+            <button class="nav-item" data-section="virtual-wardrobe">Virtual Wardrobe</button>
+            <button class="nav-item" data-section="mix-match">Mix & Match</button>
+            <button class="nav-item" data-section="style-quiz">Style Quiz</button>
+            <button class="nav-item" data-section="outfit-calendar">Outfit Calendar</button>
+        `;
+
+        document.querySelector('.container').prepend(navMenu);
+
+        // Handle navigation
+        navMenu.addEventListener('click', (e) => {
+            if (e.target.classList.contains('nav-item')) {
+                // Update active state
+                document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+                e.target.classList.add('active');
+
+                // Show selected section
+                const section = e.target.dataset.section;
+                document.querySelectorAll('.virtual-wardrobe, .mix-match, .style-quiz, .outfit-calendar, .main-form')
+                    .forEach(el => el.style.display = 'none');
+                document.querySelector(`.${section}`).style.display = 'block';
+
+                // Initialize specific features
+                if (section === 'style-quiz') {
+                    styleQuiz.start();
+                } else if (section === 'virtual-wardrobe') {
+                    wardrobe.renderItems();
+                }
+            }
+        });
+
+        // Handle Add Item Modal
+        const addItemBtn = document.querySelector('.add-item-btn');
+        const modal = document.getElementById('addItemModal');
+        const closeBtn = document.querySelector('.close');
+
+        addItemBtn.addEventListener('click', () => {
+            modal.style.display = 'block';
+        });
+
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Handle Add Item Form
+        document.getElementById('addItemForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('itemName').value,
+                category: document.getElementById('itemCategory').value,
+                color: document.getElementById('itemColor').value,
+                seasons: Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+                    .map(cb => cb.value)
+            };
+
+            const fileInput = document.getElementById('itemImage');
+            if (fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    formData.image = e.target.result;
+                    wardrobe.addItem(formData);
+                    modal.style.display = 'none';
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                wardrobe.addItem(formData);
+                modal.style.display = 'none';
+            }
+
+            e.target.reset();
+        });
+    });
 });

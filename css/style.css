@@ -899,3 +899,252 @@ select::-ms-expand {
     color: var(--neutral-300);
     font-size: 0.875rem;
 }
+
+/* Virtual Wardrobe */
+.virtual-wardrobe {
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    margin-top: 2rem;
+}
+
+.wardrobe-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.add-item-btn {
+    background: var(--accent-1);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.add-item-btn:hover {
+    background: var(--accent-2);
+    transform: translateY(-2px);
+}
+
+.wardrobe-filters {
+    display: flex;
+    gap: 1rem;
+}
+
+.wardrobe-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.wardrobe-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.wardrobe-item:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.wardrobe-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    backdrop-filter: blur(8px);
+}
+
+.modal-content {
+    background: var(--bg-color);
+    border-radius: 16px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 600px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.close {
+    position: absolute;
+    right: 1.5rem;
+    top: 1.5rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--neutral-300);
+}
+
+/* Mix & Match */
+.outfit-builder {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.outfit-slots {
+    display: grid;
+    gap: 1rem;
+}
+
+.outfit-slot {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.outfit-slot:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+}
+
+.outfit-slot i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--accent-1);
+}
+
+.outfit-preview {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 2rem;
+}
+
+/* Style Quiz */
+.style-quiz {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.quiz-progress {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    margin-bottom: 2rem;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--accent-1);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.quiz-container {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 2rem;
+}
+
+/* Outfit Calendar */
+.outfit-calendar {
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    margin-top: 2rem;
+}
+
+.calendar-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1rem;
+}
+
+.calendar-day {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 1rem;
+    min-height: 120px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.calendar-day:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+}
+
+.calendar-day.has-outfit {
+    border: 2px solid var(--accent-1);
+}
+
+.day-number {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Checkbox Group */
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Navigation Menu */
+.nav-menu {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+}
+
+.nav-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    color: var(--neutral-100);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    background: var(--accent-1);
+    color: white;
+}

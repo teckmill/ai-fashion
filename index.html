@@ -151,6 +151,130 @@
             </div>
         </div>
 
+        <div class="virtual-wardrobe" style="display: none;">
+            <h2>Your Virtual Wardrobe</h2>
+            <div class="wardrobe-controls">
+                <button class="add-item-btn">
+                    <i class="fas fa-plus"></i> Add Item
+                </button>
+                <div class="wardrobe-filters">
+                    <select id="categoryFilter">
+                        <option value="all">All Categories</option>
+                        <option value="tops">Tops</option>
+                        <option value="bottoms">Bottoms</option>
+                        <option value="dresses">Dresses</option>
+                        <option value="outerwear">Outerwear</option>
+                        <option value="shoes">Shoes</option>
+                        <option value="accessories">Accessories</option>
+                    </select>
+                    <select id="seasonFilter">
+                        <option value="all">All Seasons</option>
+                        <option value="spring">Spring</option>
+                        <option value="summer">Summer</option>
+                        <option value="fall">Fall</option>
+                        <option value="winter">Winter</option>
+                    </select>
+                </div>
+            </div>
+            <div class="wardrobe-grid"></div>
+        </div>
+
+        <!-- Add Item Modal -->
+        <div class="modal" id="addItemModal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>Add Wardrobe Item</h3>
+                <form id="addItemForm">
+                    <div class="form-group">
+                        <label for="itemName">Item Name</label>
+                        <input type="text" id="itemName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemCategory">Category</label>
+                        <select id="itemCategory" required>
+                            <option value="tops">Tops</option>
+                            <option value="bottoms">Bottoms</option>
+                            <option value="dresses">Dresses</option>
+                            <option value="outerwear">Outerwear</option>
+                            <option value="shoes">Shoes</option>
+                            <option value="accessories">Accessories</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemColor">Color</label>
+                        <input type="color" id="itemColor" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Seasons</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" value="spring"> Spring</label>
+                            <label><input type="checkbox" value="summer"> Summer</label>
+                            <label><input type="checkbox" value="fall"> Fall</label>
+                            <label><input type="checkbox" value="winter"> Winter</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemImage">Upload Image</label>
+                        <input type="file" id="itemImage" accept="image/*">
+                    </div>
+                    <button type="submit" class="submit-btn">Add Item</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Mix & Match Feature -->
+        <div class="mix-match" style="display: none;">
+            <h2>Mix & Match</h2>
+            <div class="outfit-builder">
+                <div class="outfit-slots">
+                    <div class="outfit-slot" data-type="tops">
+                        <i class="fas fa-tshirt"></i>
+                        <span>Add Top</span>
+                    </div>
+                    <div class="outfit-slot" data-type="bottoms">
+                        <i class="fas fa-socks"></i>
+                        <span>Add Bottom</span>
+                    </div>
+                    <div class="outfit-slot" data-type="shoes">
+                        <i class="fas fa-shoe-prints"></i>
+                        <span>Add Shoes</span>
+                    </div>
+                    <div class="outfit-slot" data-type="accessories">
+                        <i class="fas fa-gem"></i>
+                        <span>Add Accessory</span>
+                    </div>
+                </div>
+                <div class="outfit-preview">
+                    <h3>Outfit Preview</h3>
+                    <div class="preview-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Style Quiz Feature -->
+        <div class="style-quiz" style="display: none;">
+            <h2>Discover Your Style</h2>
+            <div class="quiz-progress">
+                <div class="progress-bar"></div>
+            </div>
+            <div class="quiz-container">
+                <!-- Questions will be dynamically loaded -->
+            </div>
+        </div>
+
+        <!-- Outfit Calendar -->
+        <div class="outfit-calendar" style="display: none;">
+            <h2>Outfit Calendar</h2>
+            <div class="calendar-controls">
+                <button class="prev-month"><i class="fas fa-chevron-left"></i></button>
+                <h3 class="current-month"></h3>
+                <button class="next-month"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <div class="calendar-grid">
+                <!-- Calendar will be dynamically generated -->
+            </div>
+        </div>
+
         <!-- Loading Animation -->
         <div class="loading-container" style="display: none;">
             <div class="loading-spinner"></div>
