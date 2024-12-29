@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/config.php';
 // Get the relative path to root based on current script location if not already set
 if (!isset($root_path)) {
     $root_path = str_repeat('../', substr_count($_SERVER['PHP_SELF'], '/') - 1);
@@ -14,14 +15,14 @@ if (!isset($root_path)) {
             <h3>Quick Links</h3>
             <ul>
                 <?php if (isset($currentUser)): ?>
-                    <li><a href="<?php echo $root_path; ?>views/designer.php">Design Outfit</a></li>
-                    <li><a href="<?php echo $root_path; ?>views/wardrobe.php">My Wardrobe</a></li>
-                    <li><a href="<?php echo $root_path; ?>views/community.php">Community</a></li>
-                    <li><a href="<?php echo $root_path; ?>views/analytics.php">Analytics</a></li>
+                    <li><a href="<?php echo SITE_URL; ?>/views/designer.php">Design Outfit</a></li>
+                    <li><a href="<?php echo SITE_URL; ?>/views/wardrobe.php">My Wardrobe</a></li>
+                    <li><a href="<?php echo SITE_URL; ?>/views/community.php">Community</a></li>
+                    <li><a href="<?php echo SITE_URL; ?>/views/analytics.php">Analytics</a></li>
                 <?php else: ?>
-                    <li><a href="<?php echo $root_path; ?>auth/signup.php">Sign Up</a></li>
-                    <li><a href="<?php echo $root_path; ?>auth/login.php">Log In</a></li>
-                    <li><a href="<?php echo $root_path; ?>auth/forgot-password.php">Forgot Password</a></li>
+                    <li><a href="<?php echo SITE_URL; ?>/auth/signup.php">Sign Up</a></li>
+                    <li><a href="<?php echo SITE_URL; ?>/auth/login.php">Log In</a></li>
+                    <li><a href="<?php echo SITE_URL; ?>/auth/forgot-password.php">Forgot Password</a></li>
                 <?php endif; ?>
             </ul>
         </div>
@@ -29,7 +30,7 @@ if (!isset($root_path)) {
             <h3>Contact</h3>
             <ul>
                 <li><a href="mailto:support@aifashion.com">support@aifashion.com</a></li>
-                <li><a href="<?php echo $root_path; ?>contact.php">Contact Us</a></li>
+                <li><a href="<?php echo SITE_URL; ?>/contact.php">Contact Us</a></li>
             </ul>
         </div>
     </div>
