@@ -205,6 +205,21 @@ CREATE TABLE IF NOT EXISTS wardrobe_analytics (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- Add wardrobe table
+CREATE TABLE IF NOT EXISTS wardrobe (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    color VARCHAR(50) NOT NULL,
+    season VARCHAR(50) NOT NULL,
+    image_path VARCHAR(255) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 -- Community Feature Tables
 
 -- Posts table for outfit sharing
@@ -287,6 +302,20 @@ CREATE TABLE IF NOT EXISTS notifications (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+-- Contact Messages Table
+CREATE TABLE IF NOT EXISTS contact_messages (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    subject VARCHAR(200) NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('new', 'read', 'replied') DEFAULT 'new',
+    replied_at TIMESTAMP NULL,
+    replied_by INT,
+    FOREIGN KEY (replied_by) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Insert sample products
 INSERT INTO products (name, description, price, category, image_url, brand) VALUES

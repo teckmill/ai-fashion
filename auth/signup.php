@@ -89,9 +89,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>/css/style.css">
-    <link rel="stylesheet" href="<?php echo SITE_URL; ?>/css/auth.css">
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>/css/auth/signup.css">
 </head>
-<body>
+<body class="auth-page">
     <?php include '../includes/header.php'; ?>
 
     <div class="auth-container">
@@ -146,30 +146,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 </div>
 
-                <button type="submit" class="btn-primary">
+                <button type="submit" class="btn-primary btn-large">
                     <i class="fas fa-user-plus"></i> Create Account
                 </button>
             </form>
 
-            <div class="social-login">
-                <div class="social-login-divider">
-                    <span>Or sign up with</span>
-                </div>
-                <div class="social-buttons">
-                    <a href="#" class="social-button">
-                        <i class="fab fa-google"></i>
-                    </a>
-                    <a href="#" class="social-button">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="#" class="social-button">
-                        <i class="fab fa-apple"></i>
-                    </a>
-                </div>
-            </div>
-
             <div class="auth-links">
-                <p>Already have an account? <a href="<?php echo SITE_URL; ?>/auth/login.php">Log In</a></p>
+                <p>Already have an account?</p>
+                <a href="<?php echo SITE_URL; ?>/auth/login.php" class="btn-secondary btn-large">Log In</a>
             </div>
         </div>
     </div>
