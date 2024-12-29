@@ -68,12 +68,12 @@ A modern, intelligent fashion assistant that helps users create personalized out
 
 1. Clone the repository:
 \`\`\`bash
-git clone https://github.com/yourusername/ai-fashion-assistant.git
+git clone https://github.com/teckmill/ai-fashion.git
 \`\`\`
 
 2. Navigate to the project directory:
 \`\`\`bash
-cd ai-fashion-assistant
+cd ai-fashion
 \`\`\`
 
 3. If using VS Code with Live Server:
