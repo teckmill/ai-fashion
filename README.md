@@ -1,6 +1,6 @@
 # AI Fashion Assistant 👔👗
 
-**STOP!!!! This is a work in progress! I will be updating this soon.**
+### STOP!!!! This is a work in progress! I will be updating this soon.
 
 A modern, intelligent fashion assistant that helps users create personalized outfits, manage their wardrobe, and develop their personal style. Built with PHP, MySQL, and modern JavaScript, this application provides a comprehensive fashion experience with real-time product recommendations and style insights.
 
